@@ -1,1 +1,2 @@
-print("hello_name")
+name=inpuut()
+print("hello"+name)
