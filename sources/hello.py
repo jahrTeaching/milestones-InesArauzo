@@ -1,2 +1,1 @@
-hello=input()
-print(name)
+print("hello")
