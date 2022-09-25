@@ -4,9 +4,12 @@ import scipy.optimize as scp
 
 plt.style.use ('seaborn-colorblind')
 
-N=1000
+
 dim=4
+
 dt=0.01
+N=1000
+
 
 
 def F(U, t):
@@ -80,6 +83,13 @@ for i in range(1, N):
     xCN[i]=UCN[0]
     yCN[i]=UCN[1]
 
+
+np.savetxt('xEuler0001.csv', xEuler, delimiter=',')
+np.savetxt('yEule0001r.csv', yEuler, delimiter=',')
+np.savetxt('xRK40001.csv', xRK4, delimiter=',')
+np.savetxt('yRK40001.csv', yRK4, delimiter=',')
+np.savetxt('xCN0001.csv', xCN, delimiter=',')
+np.savetxt('yCN0001.csv', yCN, delimiter=',')
 plt.plot(xEuler, yEuler, 'go')
 plt.title('Orbit Euler')
 plt.xlabel('xEuler')
@@ -100,3 +110,5 @@ plt.xlabel('xCN')
 plt.ylabel('yCN')
 plt.axis('equal')
 plt.show()
+
+
