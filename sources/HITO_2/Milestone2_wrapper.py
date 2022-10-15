@@ -1,8 +1,8 @@
 from numpy import array, linspace
 import matplotlib.pyplot as  plt
-from Cauchy_Problem import Cauchy
-from Time_Schemes import Euler, CN, RK4, BW_Euler
-from Forcing_Sides import Kepler
+from resources.Cauchy_Problem import Cauchy
+from resources.Time_Schemes import Euler, CN, RK4, BW_Euler
+from resources.Forcing_Sides import Kepler
 
 
 
@@ -14,9 +14,9 @@ def Cauchy_wrapper(T, N, t_scheme):
 
 
 
-t_schemes = [ Euler, RK4, CN, BW_Euler ]
-t_scheme_name = [ "Euler", "RK4", "CN" , "BW_Euler" ]
-t_scheme_fig = [ "Euler.png", "RK4.png", "CN.png", "BW_Euler.png" ]
+t_schemes = [  CN, BW_Euler ]
+t_scheme_name = [ "CN" , "BW_Euler" ]
+t_scheme_fig = ["CN.png", "BW_Euler.png" ]
 i = 0
 for t_scheme in t_schemes:
 

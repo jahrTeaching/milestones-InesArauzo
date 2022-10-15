@@ -1,4 +1,4 @@
-from Math_Operators import Newton_Raphson
+from resources.Math_Operators import Newton_Raphson
 from scipy.optimize import fsolve
 from numpy import float64
 def Euler(U, F, t, dt):
@@ -11,7 +11,7 @@ def CN( Un, F,  t, dt):
         
         return Un1 - Un - dt/2 * ( F (Un1, t + dt) + F (Un, t) )
 
-    U = Newton_Raphson(func, Un)
+    U = fsolve(func, Un)
 
     return U
 
@@ -32,6 +32,6 @@ def BW_Euler(Un, F, t, dt):
     def BW_Euler_eqn(Un1):
 
         return Un1 - Un - dt * F(Un, t)
-    U = Newton_Raphson ( BW_Euler_eqn, Un )
+    U = fsolve ( BW_Euler_eqn, Un )
 
     return U
