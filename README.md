@@ -1,6 +1,6 @@
-# MUSE Milestones
+# MUSE Milestones 
 ### [contents PDF](https://github.com/jahrTeaching/Milestones/blob/main/MUSE_weekly_milestones.pdf)
-
+Inés Arauzo Andrés
 Create: 
 1. /sources/program.py. It should print "Hello" (first week) 
 2. /sources/hello_name.py. It should take input name xxx from keyboard and print "Hello xxxx" (first week)
