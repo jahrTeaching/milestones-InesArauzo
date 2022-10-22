@@ -56,10 +56,7 @@ def Convergence_Rate(Time_Scheme, F, U0, t):
         Nt = 2*Nt
         t_2 =linspace(0, T, Nt)
         U_t_2 =  Cauchy(F, Time_Scheme, U0, t_2)
-        #Deberias modificar el codigo del error pa 
-        # que puedas elegir la diferencia entre las mallas
-        # y para que te devuelva el error y la norma de 
-        # U2-U1, pero hoy ya no puc mes
+        
 
         log_diff_U21[i] = log10(norm(U_t_2[int(Nt - 1), :] - U_t[int(0.5*Nt - 1), :]))
         log_Nt[i] = log10(Nt)
