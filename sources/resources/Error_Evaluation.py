@@ -1,12 +1,12 @@
-from numpy import linspace, zeros, log10, round_
+from re import L
+from numpy import linspace, zeros, log10, round_, array, float64
 from numpy.linalg import norm
 from sklearn.linear_model import LinearRegression
 from resources.Cauchy_Problem import Cauchy
-#def Error_btw_grids (Time_Scheme, F, U0, t, a):
+from resources.Time_Schemes import Euler, RK4, CN, BW_Euler, LeapFrog
+from cmath import  pi, sin, cos
+from mpmath import findroot
 
-#    t_2 =linspace(0, t[len(t) - 1], a*len(t))
-#    U_t = Cauchy(F, Time_Scheme, U0, t)
-#    U_t_2 =  Cauchy(F, Time_Scheme, U0, t_2)
 
 def Error_Cauchy_Problem (Time_Scheme, Scheme_Order, F, U0, t):
 
@@ -81,3 +81,19 @@ def Convergence_Rate(Time_Scheme, F, U0, t):
 
 
     return [log_diff_U21, log_Nt, lin_log_diff_U21, lin_log_Nt, order]
+
+
+def Stability_Region(t_scheme): 
+
+    N = 100
+    x, y = linspace(-5, 5, N), linspace(-5, 5, N)
+    rho =  zeros( (N, N),  dtype = float64)
+
+    for i in range(N): 
+      for j in range(N):
+
+          w = complex(x[i], y[j])
+          r = t_scheme( 1, lambda u, t: w*u,  0, 1 )
+          rho[i, j] = abs(r) 
+
+    return rho, x, y
