@@ -1,0 +1,59 @@
+
+import numpy as np
+import matplotlib.pyplot as  plt
+
+plt.style.use ('seaborn-colorblind')
+
+N=1000
+dim=4
+dt=0.01
+
+#METODO DE EULER
+x2=np.zeros((N,))
+y2=np.zeros((N,))
+u2=np.zeros((N,))
+v2=np.zeros((N,))
+
+x2[0]=1
+y2[0]=0
+u2[0]=0
+v2[0]=1
+
+for i in range(0, N-1):
+    u2[i+1]=u2[i]-dt*x2[i]/((x2[i]**2+y2[i]**2)**(3/2))
+    x2[i+1]=x2[i]+u2[i+1]*dt
+    v2[i+1]=v2[i]-dt*y2[i]/(x2[i]**2+y2[i]**2)**(3/2)
+    y2[i+1]=y2[i]+v2[i+1]*dt
+
+
+plt.plot(x, y, 'go')
+plt.title('orbit1')
+plt.xlabel('x')
+plt.ylabel('y')
+plt.axis('equal')
+plt.show()
+
+#METODO DE CRANK NICHOLSON
+x=np.zeros((N,))
+y=np.zeros((N,))
+u=np.zeros((N,))
+v=np.zeros((N,))
+
+x[0]=1
+y[0]=0
+u[0]=0
+v[0]=1
+
+for i in range(0, N-1):
+    u[i+1]=u[i]-dt*x[i]/((x[i]**2+y[i]**2)**(3/2))
+    x[i+1]=x[i]+u[i+1]*dt
+    v[i+1]=v[i]-dt*y[i]/(x[i]**2+y[i]**2)**(3/2)
+    y[i+1]=y[i]+v[i+1]*dt
+
+
+plt.plot(x, y, 'go')
+plt.title('orbit1')
+plt.xlabel('x')
+plt.ylabel('y')
+plt.axis('equal')
+plt.show()
