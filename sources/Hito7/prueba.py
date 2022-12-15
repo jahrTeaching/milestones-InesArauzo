@@ -1,7 +1,7 @@
-from stl import mesh 
+from stl import mesh
 from numpy import deg2rad, array, size, dot, zeros, inner
 from numpy.linalg import norm
-from math import cos, sin, acos, pi
+from math import cos, sin, acos, pi, radians
 
 from matplotlib import pyplot
 from mpl_toolkits import mplot3d
@@ -40,10 +40,11 @@ def CP_STL(stlfile: str ,alpha: float, beta: float , M: float, g: float):
 
     Model = mesh.Mesh.from_file(stlfile)
     normals = Model.normals
+    areas = Model.areas
+    
     
     V_dir_W = array([1,0,0])
     V_dir_B = rotation_BW(alpha,beta,V_dir_W)
-    #V_dir_B =  V_dir_W
 
     
     theta = zeros(size(normals,0))
@@ -51,6 +52,8 @@ def CP_STL(stlfile: str ,alpha: float, beta: float , M: float, g: float):
     Cp_mod = zeros(size(normals,0))
 
     Cp_max = 2/(g*M**2) * ( (((g+1)**2 * M**2)/(4*g*M**2-2*(g-1)))**(g/(g-1)) * (1-g+2*g*M**2)/(g+1) - 1 )
+
+    F = zeros(3)
 
     for i in range(size(normals,0)):
 
@@ -65,19 +68,15 @@ def CP_STL(stlfile: str ,alpha: float, beta: float , M: float, g: float):
 
         Cp[i] = 2*(sin(theta[i]))**2 
         Cp_mod[i] = Cp_max*2*(sin(theta[i]))**2
+        
+    return Cp, Cp_mod 
+
+[Cp, Cp_mod] = CP_STL(stlfile='cow.stl', alpha = 0, beta = 0, M = 10, g = 1.4)
 
 
-    return Cp, Cp_mod
-
-[Cp, Cp_mod] = CP_STL(stlfile='pikachu.stl', alpha = 30, beta = 0, M = 10, g = 1.4)
-"""
-file= open('Apollo.csv', 'w')
-file.write(Cp)
-file.close()
-"""
-
-mesh = mesh.Mesh.from_file('pikachu.stl')
+mesh = mesh.Mesh.from_file('cow.stl')
 
 vpl.mesh_plot(mesh, tri_scalars=Cp)
 
 vpl.show()
+

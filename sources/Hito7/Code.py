@@ -72,7 +72,6 @@ def Flechita(x): # Se la ha inventado rafa
 ################################################
 #####          Rotation Functions          #####
 ################################################ 
-
 def TBW_matrix(alpha: float, beta:float):
 
     """Creation of the rotation matrix Body Wind.
@@ -104,9 +103,7 @@ def TWB_matrix(alpha:float, beta:float):
 
     Returns:
         Tbw(array): Rotation matrix.
-    """    
-
-
+    """  
     alpha = deg2rad(alpha)
     beta = deg2rad(beta)
 
@@ -116,6 +113,7 @@ def TWB_matrix(alpha:float, beta:float):
 
     return Twb
 
+@njit(parallel=True)
 def rotation_WB(alpha: float, beta: float, Data: array): 
     """ Coordinates change from Wind frame to Body frame.
 
@@ -132,6 +130,7 @@ def rotation_WB(alpha: float, beta: float, Data: array):
 
     return dot(Twb,Data)
 
+@njit(parallel=True)
 def rotation_BW(alpha: float, beta: float, Data: array): 
     """ Coordinates change between Body and Wind frame.
 
@@ -167,6 +166,7 @@ def rotation_rev(phi: float, Data: array):
 
 ###########################
 #### Funciones serias ####
+
 def Analytical_Derivative(x, f):
 
     return ( f(x+1E-8)-f(x) ) / (1E-8)
@@ -179,6 +179,7 @@ def Theta_calculation(x, f):
 
     return theta
 
+@njit(parallel=True)
 def Normal(x, f):
     """Given a function f evaluated on an x partition, returns the normal vector of every partition
 
@@ -234,7 +235,7 @@ def Cp_Dist_1D_by_Newton_Modified(x, f, M, gamma=1.4, Mach=10):
 
 
 ###############################
-
+@njit(parallel=True)
 def Revoluting_Normals(Normals_array):
     """Given the normal vector field of a 1D shape in an array, returns the  normal vector field of the 3D revoluted shape
 
@@ -258,7 +259,7 @@ def Revoluting_Normals(Normals_array):
     return Normals_revoluted
 
 # Giro de las normales para un alpha o beta
-#@njit(parallel=True)
+
 def Rotated_Normals_Loops(alpha: float, beta: float, Normals_tensor: array):
     """ Rotation of all the normals a certain angle of atack and a certain sideslip.
 
@@ -271,7 +272,7 @@ def Rotated_Normals_Loops(alpha: float, beta: float, Normals_tensor: array):
         Normals_tensor_rotated: Tensor in which each matrix represents all the normals along a section of the revolution surface
                                 taking into acount the angle of atack and the sideslip. 
     """    
-    t0 = process_time()
+    t0     = process_time()
     nx     = size(Normals_tensor,0)     # Number of partitions in X = Number of matrixes in the tensor
     nphi   = size(Normals_tensor,1)     # Number of partitions in the revolution angle = Number of files in the matrix
     ncomps = size(Normals_tensor,2)     # Number of components (3 = i j k)
@@ -287,8 +288,21 @@ def Rotated_Normals_Loops(alpha: float, beta: float, Normals_tensor: array):
 
     return Normals_tensor_rotated
 
-#@njit(parallel=True)
+
+
+
 def Rotated_Normals_Giant(alpha: float, beta: float, Normals_tensor: array):
+    """_summary_
+
+    Args:
+        alpha (float): Angle of atack.       [Deg]
+        beta (float): Sideslip.              [Deg]
+        Normals_tensor (array): Tensor in which each matrix represents all the normals along a section of the revolution surface 
+
+    Returns:
+        Output (array): Tensor in which each matrix represents all the normals 
+    """    
+    
 
     t0 = process_time()
     nx     = size(Normals_tensor,0)     # Number of partitions in X = Number of matrixes in the tensor
@@ -298,18 +312,19 @@ def Rotated_Normals_Giant(alpha: float, beta: float, Normals_tensor: array):
     Output = zeros( [nx, nphi, ncomps] )
     
     Tbw = TBW_matrix(alpha, beta)
-    Tbw_giant = zeros([3*nphi, 3*nphi])
+    # Tbw_giant = zeros([3*nphi, 3*nphi])
 
     # Giant matrix building
-    for i in range( nphi ):
+    Tbw_giant = tbw_giant_loop (zeros([3*nphi, 3*nphi]), Tbw, nphi)
+    # for i in range( nphi ):
 
-        Tbw_giant[3*i:3*i+3, 3*i:3*i+3] = Tbw
+    #     Tbw_giant[3*i:3*i+3, 3*i:3*i+3] = Tbw
     
     for i in range( size(Normals_tensor,0) ):
 
-        p_O = reshape(Output[i,:,:], [3*nphi])         # Pointer to the Output tensor. It will be a column vector
+        p_O = reshape(Output[i,:,:], [3*nphi])          # Pointer to the Output tensor. It will be a column vector
         p_T = reshape(Normals_tensor[i,:,:], [3*nphi])  # Pointer to the Input tensor. It will be a column  vector
-        p_O[:] = p_O[:] + dot(Tbw_giant, p_T)          # Vector corresponding to all normals rotated for a x value
+        p_O[:] = p_O[:] + dot(Tbw_giant, p_T)           # Vector corresponding to all normals rotated for a x value
 
     t1 = process_time()
     print('Elapsed processtime=', t1-t0)
@@ -317,7 +332,22 @@ def Rotated_Normals_Giant(alpha: float, beta: float, Normals_tensor: array):
     return Output
 
 ###################################
+@njit(parallel=True)
+def tbw_giant_loop (A, Tbw, nphi):
+    """_summary_
+hola warra
+    Args:
+        A (array): tensor full of zeros where 
+        Tbw (_type_): _description_
+        nphi (_type_): _description_
 
+    Returns:
+        _type_: _description_
+    """    
+    for i in range( nphi ):
+
+        A [3*i:3*i+3, 3*i:3*i+3] = Tbw
+    return A
 
     
 
@@ -439,15 +469,14 @@ def Rotated_Normals_Giant(alpha: float, beta: float, Normals_tensor: array):
     
     for i in range( size(Normals_tensor,0) ):
 
-        p_O = reshape(Output[i,:,:], [3*nphi])          # Pointer to the Output tensor. It will be a column vector
+        p_O = reshape(Output[i,:,:], [3*nphi])         # Pointer to the Output tensor. It will be a column vector
         p_T = reshape(Normals_tensor[i,:,:], [3*nphi])  # Pointer to the Input tensor. It will be a column  vector
-        p_O[:] = p_O[:] + dot(Twb_giant, p_T)           # Vector corresponding to all normals rotated for a x value
+        p_O[:] = p_O[:] + dot(Twb_giant, p_T)          # Vector corresponding to all normals rotated for a x value
 
     t1 = process_time()
     print('Elapsed processtime=', t1-t0)
-    t=t1-t0
 
-    return Output, t
+    return Output
 
 A = array([[0.1, 0.6, -0.1],
            [0.2, 0.3, -0.3],
@@ -487,8 +516,6 @@ for i, n in enumerate(N):
 
 
 X = Rotated_Normals_Loops(-15,0,Normals_revoluted)
-
-
 
 X2, time2 = Rotated_Normals_Giant(-15,0,Normals_revoluted)
 

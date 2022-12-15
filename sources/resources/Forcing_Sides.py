@@ -1,5 +1,8 @@
-from numpy import array, reshape, zeros, size 
-from numpy.linalg import norm
+from numpy import array, reshape, zeros, size, sqrt
+from numpy.linalg import norm, eig
+from scipy.optimize import fsolve, newton
+from resources.Math_Operators import Jacobian
+
 
 def Kepler(U, t):
 
@@ -16,7 +19,7 @@ def Harmonic_Oscilator(U, t):
 
 
 
-def N_Body_Problem(U,t):  
+def N_Body_Problem(U:array,t:array):  
     """The N-body problem is the problem of predicting the individual motions of a
        group of mass objects under the influence of their gravitational field
        The function F_NBody uses the state vector U as an input
@@ -58,3 +61,32 @@ def N_Body_Problem(U,t):
                 dvdt[i, :] = dvdt[i, :] + d[:]/(norm(d)**3)  
 
     return F
+
+def R3BodyProblem(U:array, t:array):
+    """Restrcted 3-body problem
+
+    Args:
+        U (array): state vector (position_i, velocity_i)
+        t (array): time partition
+
+    Returns:
+        F(array): derivative of U (velocity_i, acceleration_i)
+    """    
+    mu =3.0039e-7# 0.0121505856
+
+    x =  U[0]   
+    y =  U[1]   
+    vx = U[2]  
+    vy = U[3]  
+
+    d = sqrt( (x + mu)**2 + y**2 )
+    r = sqrt( (x - 1 + mu)**2 + y**2 )
+
+
+    ax = x + 2*vy - (1 - mu)*( x + mu )/d**3 - mu*(x - 1 + mu)/r**3
+    ay = y - 2*vx - (1 - mu) * y/d**3 - mu * y/r**3
+
+    return array( [ vx, vy, ax, ay ] )
+
+
+

@@ -78,8 +78,8 @@ for i in range(len(r)):
 
 print(U0)
 
-#t_schemes = [ Euler, CN, RK4, BW_Euler, Leapfrog ]
-t_schemes = [RK4]
+t_schemes = [ Euler, CN, RK4, BW_Euler ]
+#t_schemes = [RK4]
 
 for j in range (size(t_schemes)):
 
@@ -169,14 +169,3 @@ data = array([x, y, z])
 data2 = array([x2, y2, z2])
 data3 = array([x3, y3, z3])
 data4 = array([x4, y4, z4])
-fig = plt.figure()
-ax = Axes3D(fig)
-line, =  plt.plot(data[0], data[1], data[2], lw=1, c='red')
-line2, = plt.plot(data2[0], data2[1], data2[2], lw=1, c='blue')
-line3, = plt.plot(data3[0], data3[1], data3[2], lw=1, c='green')
-line4, = plt.plot(data4[0], data4[1], data4[2], lw=1, c='purple')
-line_ani = animation.FuncAnimation(fig, animate, frames=n, fargs=(data, line), interval=100, blit=False)
-line_ani2 = animation.FuncAnimation(fig, animate, frames=n, fargs=(data2, line2), interval=100, blit=False)
-line_ani3 = animation.FuncAnimation(fig, animate, frames=n, fargs=(data3, line3), interval=100, blit=False)
-line_ani4 = animation.FuncAnimation(fig, animate, frames=n, fargs=(data4, line4), interval=100, blit=False)
-plt.show()
